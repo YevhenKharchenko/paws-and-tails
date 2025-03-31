@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import React, {useState} from 'react';
 import styles from './styles';
+import {HidePassIcon, ViewPassIcon} from '../../../assets/icons/index';
 
 interface IInputValue {
   email: string;
@@ -19,6 +20,7 @@ interface IInputValue {
 }
 
 export default function LoginPage() {
+  const [isPassHidden, setIsPassHidden] = useState(true);
   const [inputValues, setInputValues] = useState<IInputValue>({
     email: '',
     password: '',
@@ -53,6 +55,13 @@ export default function LoginPage() {
     }
   };
 
+  const isDisabledLoginBtn = Boolean(
+    inputValues.errorEmail ||
+      inputValues.errorPassword ||
+      !inputValues.email ||
+      !inputValues.password,
+  );
+
   return (
     <TouchableWithoutFeedback
       onPress={() => {
@@ -65,8 +74,8 @@ export default function LoginPage() {
           <View style={styles.titleContainer}>
             <Text style={styles.title}>Раді тебе вітати!</Text>
             <Text style={styles.welcomeText}>
-              Кожен пухнастик заслуговує на дбайливих господарів.Ми допоможемо
-              тобі знайти друга.
+              Кожен пухнастик заслуговує на дбайливих господарів.{'\n'}Ми
+              допоможемо тобі знайти друга.
             </Text>
           </View>
           <View style={styles.buttonContainer}>
@@ -101,14 +110,30 @@ export default function LoginPage() {
                   handleChangeInput('password', text);
                   checkPassword(text);
                 }}
-                secureTextEntry={true}
+                secureTextEntry={isPassHidden}
               />
-              {inputValues.errorPassword && (
-                <Text>{inputValues.errorPassword}</Text>
-              )}
+              <TouchableOpacity
+                onPress={() => {
+                  setIsPassHidden(!isPassHidden);
+                }}
+                hitSlop={{top: 15, bottom: 15, right: 15, left: 15}}>
+                {isPassHidden ? (
+                  <ViewPassIcon fill={'#000000'} />
+                ) : (
+                  <HidePassIcon fill={'#a36161'} />
+                )}
+              </TouchableOpacity>
             </View>
+            {inputValues.errorPassword && (
+              <Text>{inputValues.errorPassword}</Text>
+            )}
           </View>
-          <TouchableOpacity style={styles.loginBtnContainer}>
+          <TouchableOpacity
+            style={[
+              styles.loginBtnContainer,
+              isDisabledLoginBtn && {opacity: 0.5},
+            ]}
+            disabled={isDisabledLoginBtn}>
             <Text style={styles.loginText}>Увійти</Text>
           </TouchableOpacity>
         </KeyboardAvoidingView>
